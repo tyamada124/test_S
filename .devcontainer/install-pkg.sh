@@ -9,8 +9,7 @@ package_list="net-tools \
   jq \
   less \
   git \
-  ca-certificates
-"
+  ca-certificates"
 apt-get update -y
 apt-get install -y --no-install-recommends ${package_list[@]}
 rm -rf /var/lib/lists
