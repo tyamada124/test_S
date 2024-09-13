@@ -7,14 +7,12 @@ WORKDIR /app
 COPY ../ .
 
 # aqua install
-RUN <<EOF bash -ex
-apt-get update -y
-apt-get install -y --no-install-recommends wget ca-certificates
-wget -q https://github.com/aquaproj/aqua/releases/download/v2.30.0/aqua_linux_amd64.tar.gz
-rm -rf /usr/local/bin/aqua && tar -C /usr/local/bin/ -xzf aqua_linux_amd64.tar.gz
-rm aqua_linux_amd64.tar.gz
-rm -rf /var/lib/lists
-EOF
+RUN apt-get update -y && \
+apt-get install -y --no-install-recommends wget ca-certificates && \
+wget -q https://github.com/aquaproj/aqua/releases/download/v2.30.0/aqua_linux_amd64.tar.gz && \
+rm -rf /usr/local/bin/aqua && tar -C /usr/local/bin/ -xzf aqua_linux_amd64.tar.gz && \
+rm aqua_linux_amd64.tar.gz && \
+rm -rf /var/lib/lists 
 
 # install packages and some tools.
 # NOTE: rye is installed by aqua.
@@ -52,15 +50,13 @@ ARG USER_NAME="sigma"
 ARG APP_NAME="sigma_super_app" # FIXME
 
 # create execution user with sudo
-RUN <<EOF bash -ex
-echo 'Creating ${USER_NAME} group.'
-addgroup ${USER_NAME}
-echo 'Creating ${USER_NAME} user.'
-adduser --ingroup ${USER_NAME} --gecos "sigma_super_app user" --shell /bin/bash --no-create-home --disabled-password ${USER_NAME}
-echo 'using sudo'
-usermod -aG sudo ${USER_NAME}
+RUN echo 'Creating ${USER_NAME} group.'&& \
+addgroup ${USER_NAME} && \
+echo 'Creating ${USER_NAME} user.' && \
+adduser --ingroup ${USER_NAME} --gecos "sigma_super_app user" --shell /bin/bash --no-create-home --disabled-password ${USER_NAME} && \
+echo 'using sudo' && \
+usermod -aG sudo ${USER_NAME} && \
 echo "${USER_NAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-EOF
 
 COPY --from=devcontainer --chown=${USER_NAME}:${USER_NAME} ["/app/dist/${APP_NAME}-${VERSION}-py3-none-any.whl", "/app/dist/${APP_NAME}-${VERSION}-py3-none-any.whl"]
 
